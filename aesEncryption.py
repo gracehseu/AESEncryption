@@ -3,7 +3,7 @@ def readFile(file, numBits):
   # count the number of bits to read 
   numBytes = numBits // 8
   # read file as binary
-  in_file = open(file, rb)
+  in_file = open(file, 'rb')
   byteArray = []
   for 16 in range(8):
     byteArray.append(in_file.read(1))
@@ -29,22 +29,49 @@ def byteTable(file):
   lookupTable = []
   for line in in_file:
     splitLine = line.split()
-    lookupTable.append(line)
+    for byte in splitLine:
+      lookupTable.append(byte)
   return lookupTable
 
-def subBytes():
-  # for each byte in array, use value to find an fixed-256 element lookup
-  for i in range(4):
-    for j in range(4):
-      
+# each byte in the state is replaced with 
+# its entry in a fixed 8-bit lookup table (S-box)
+def subBytes(state, sBox):
+  for row in range(4):
+    for column in range(4):
+      state[row][column] = sBox[state[row][column]]
+  return state
+
+def shiftRows(state):
+  stateTemp = state
+  # do nothing for row 0
+  # shift row 1 one over
+  state[1][0] = stateTemp[1][3]
+  state[1][1] = stateTemp[1][2]
+  state[1][2] = stateTemp[1][1]
+  state[1][3] = stateTemp[1][0]
+
+  # shift row 2 two over
+  state[2][0] = stateTemp[2][2]
+  state[2][1] = stateTemp[2][3]
+  state[2][2] = stateTemp[2][0]
+  state[2][3] = stateTemp[2][1]  
+
+  # shift row 3 three over
+  state[3][0] = stateTemp[3][3]
+  state[3][1] = stateTemp[3][0]
+  state[3][2] = stateTemp[3][1]
+  state[3][3] = stateTemp[3][2]  
+  return state
+
+
 def cipher(inputArray, ):
 
 def state():
-  stateArray = [4][4]
+  state = [4][4]
 
   # setting up column-major order array
-  for i in range(4):
-    for j in range(4):
-      stateArray[j][i] = byteArray[i][j]
+  for row in range(4):
+    for column in range(4):
+      state[row][column] = byteArray[row][column]
 
 

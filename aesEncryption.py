@@ -41,6 +41,8 @@ def subBytes(state, sBox):
       state[row][column] = sBox[state[row][column]]
   return state
 
+# bytes in each row of the state are shifted 
+# cyclically to the left
 def shiftRows(state):
   stateTemp = state
   # do nothing for row 0
@@ -63,6 +65,19 @@ def shiftRows(state):
   state[3][3] = stateTemp[3][2]  
   return state
 
+def mixColumnsHelper(column, matrixMultiply):
+  b = []
+  # go through each row of the matrix
+  for row in range(len(matrix)):
+    newB = 0
+    for a in range(len(column)):
+      newB += matrix[row][a] * column[a]
+    b.append(newB)
+  return b
+
+def mixColumns(state, matrixMultiply):
+  for row in range(4):
+    
 
 def cipher(inputArray, ):
 

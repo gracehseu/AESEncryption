@@ -65,7 +65,8 @@ def shiftRows(state):
   state[3][3] = stateTemp[3][2]  
   return state
 
-# helper function matrix multiplies column individually 
+# helper function matrix multiplies column 
+# individually 
 def mixColumnsHelper(column, matrixMultiply):
   b = []
   # go through each row of the matrix
@@ -76,9 +77,11 @@ def mixColumnsHelper(column, matrixMultiply):
     b.append(newB)
   return b
 
+# each column of the state is multiplied 
+# with a fixed polynomial
 def mixColumns(state, matrixMultiply):
-  # helper function returns rows want to make sure that we put those in the right place
-
+  # helper function returns rows want to make sure 
+  # that we put those in the right place
   for column in range(4):
     columnA = []
     for row in range(4):

@@ -35,7 +35,7 @@ def keyExpansion(keyFile, keyLength):
     for t in range(4):
       temp.append(keySchedule[i - 1, t])
 
-    if (i % keyLength == 0)
+    if (i % keyLength == 0):
       temp = subWord(rotWord(temp, Sbox))
       for t in range(len(temp)):
         temp[t] ^= roundConstant[i // keyLength][t]
@@ -68,6 +68,6 @@ def rotWord(word):
 # addititon in place, AES addition is XOR
 def addRoundKey(state, keySchedule, numRounds):
   for row in range(4):
-    for colum in range(4):
+    for column in range(4):
       state[row][column] ^= keySchedule[numRounds * 4 + column][row]
   return state

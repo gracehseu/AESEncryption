@@ -1,22 +1,26 @@
-
+import sys
 from encrypt import encrypt
 from decrypt import decrypt
 
 def main():
-  # command line input
-  aesInput = input().split()
+
 
   # getting arguments for each line
-  keySize = aesInput[aesInput.input("--keysize") + 1]
-  keyFile = aesInput[aesInput.input("--keyfile") + 1]
-  inputFile = aesInput[aesInput.input("--inputfile") + 1]
-  outputFile = aesInput[aesInput.input("--outputfile") + 1]
-  mode = aesInput[aesInput.input("--mode") + 1]
+  keySize = int(sys.argv[sys.argv.index("--keysize") + 1])
+  keyFile = sys.argv[sys.argv.index("--keyfile") + 1]
+  inputFile = sys.argv[sys.argv.index("--inputfile") + 1]
+  outputFile = sys.argv[sys.argv.index("--outputfile") + 1]
+  mode = sys.argv[sys.argv.index("--mode") + 1]
 
+
+  print ( keySize, keyFile, inputFile, outputFile, mode)
   # error checking for keysize and mode
-  if keySize != 128 or keySize != 256:
+  print (type(keySize))
+  if keySize != 128 and keySize != 256:
+    print("keysize not valid")
     return
-  if mode != "encrypt" or mode != "decrypt":
+  if mode != "encrypt" and mode != "decrypt":
+    print("mode not valid")
     return 
 
   # determining the number of rounds based on keysize
@@ -29,39 +33,24 @@ def main():
     numRounds = 14
     keyLength = 8
   
+  key_file = open(keyFile, 'rb')
+  key_bytes = key_file.read()
   # return outputfile based on mode
   if mode == "encrypt":
-    return encrypt()
+    print("encrypting")
+
+    return encrypt(inputFile, outputFile, keySize, key_bytes, keyLength, numRounds)
   else:
-    return decrypt()
+    print("decrypting")
+    return decrypt(inputFile, outputFile, keySize, key_bytes, keyLength, numRounds)
 
-# function for reading file
-def readFile(file, numBits):
-  # count the number of bits to read 
-  numBytes = numBits // 8
-  # read file as binary
-  in_file = open(file, 'rb')
-  byteArray = []
-  for 16 in range(8):
-    byteArray.append(in_file.read(1))
-  return byteArray
-def byteTable(file):
-  in_file = open(string(file), "r")
-  lookupTable = []
-  for line in in_file:
-    splitLine = line.split()
-    for byte in splitLine:
-      lookupTable.append(byte)
-  return lookupTable
+# def state():
+#   state = [4][4]
 
-
-def state():
-  state = [4][4]
-
-  # setting up column-major order array
-  for row in range(4):
-    for column in range(4):
-      state[row][column] = byteArray[row][column]
+#   # setting up column-major order array
+#   for row in range(4):
+#     for column in range(4):
+#       state[row][column] = byteArray[row][column]
 
 
 

@@ -5,13 +5,12 @@ from keyschedule import keyExpansion
 def encrypt(inputFile, outputFile, keySize, keyFile, keyLength, numRounds):
   keySchedule = keyExpansion(keyFile, keyLength)
 
-  numBytes = numBits // 8
+  # numBytes = numBits // 8
   # read file as binary
   in_file = open(inputFile, 'rb')
-  out_file = open(outputFile, 'w')
+  out_file = open(outputFile, 'wb')
   
   # try catch surrounding, lots of testing
-  
 
   file_bytes = in_file.read()
   padding_length = 16 - len(file_bytes) % 16
@@ -22,14 +21,17 @@ def encrypt(inputFile, outputFile, keySize, keyFile, keyLength, numRounds):
 
   for i in range(len(file_bytes) // 16):
     state = []
-    chunk = file_bytes[i * 16, (i + 1) * 16]
+    chunk = file_bytes[i * 16:(i + 1) * 16]
     for row in range(4):
+      state.append([])
       for column in range(4):
-        state[row][column] = chunk[row * 4 + column]
+        if len(state[row]) <= 0:
+          state[row].append([])
+        state[row].append(chunk[row * 4 + column])
 
 
 
-    output = decipher(state, keySchedule, numRounds)
+    output = cipher(state, keySchedule, numRounds)
     bytes_written = out_file.write(output)
     # sanity check
     assert(bytes_written == 16)

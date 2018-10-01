@@ -13,9 +13,9 @@ def main():
   mode = sys.argv[sys.argv.index("--mode") + 1]
 
 
-  print ( keySize, keyFile, inputFile, outputFile, mode)
+  # print ( keySize, keyFile, inputFile, outputFile, mode)
   # error checking for keysize and mode
-  print (type(keySize))
+  # print (type(keySize))
   if keySize != 128 and keySize != 256:
     print("keysize not valid")
     return
@@ -37,7 +37,7 @@ def main():
   key_bytes = key_file.read()
   # return outputfile based on mode
   if mode == "encrypt":
-    print("encrypting")
+    # print("encrypting")
 
     return encrypt(inputFile, outputFile, keySize, key_bytes, keyLength, numRounds)
   else:

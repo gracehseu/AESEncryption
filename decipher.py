@@ -1,3 +1,6 @@
+
+from keyschedule import addRoundKey
+
 invsBox =  [0x52, 0x09, 0x6a, 0xd5, 0x30, 0x36, 0xa5, 0x38, 0xbf, 0x40, 0xa3, 0x9e, 0x81, 0xf3, 0xd7, 0xfb,
             0x7c, 0xe3, 0x39, 0x82, 0x9b, 0x2f, 0xff, 0x87, 0x34, 0x8e, 0x43, 0x44, 0xc4, 0xde, 0xe9, 0xcb,
             0x54, 0x7b, 0x94, 0x32, 0xa6, 0xc2, 0x23, 0x3d, 0xee, 0x4c, 0x95, 0x0b, 0x42, 0xfa, 0xc3, 0x4e,
@@ -17,7 +20,7 @@ invsBox =  [0x52, 0x09, 0x6a, 0xd5, 0x30, 0x36, 0xa5, 0x38, 0xbf, 0x40, 0xa3, 0x
 
 # each byte in the state is replaced with 
 # its entry in a fixed 8-bit lookup table (S-box)
-def invSubBytes(state):
+def inv_sub_bytes(state):
   for row in range(4):
     for column in range(4):
       state[row][column] = invsBox[state[row][column]]
@@ -25,34 +28,40 @@ def invSubBytes(state):
 
 # bytes in each row of the state are shifted 
 # cyclically to the left
-def invshiftRows(state):
-  stateTemp = state
-  # do nothing for row 0
+def inv_shift_rows(state):
+  stateTemp = []
+  for row in range(4):
+    stateTemp.append([])
+    for column in range(4):
+      stateTemp[row].append(state[row][column])
 
-  # shift row 1 one over
-  state[1][0] = stateTemp[1][3]
-  state[1][1] = stateTemp[1][0]
-  state[1][2] = stateTemp[1][1]
-  state[1][3] = stateTemp[1][2]
+  state[0][0] = stateTemp[0][0]
+  state[1][1] = stateTemp[0][1]
+  state[2][2] = stateTemp[0][2]
+  state[3][3] = stateTemp[0][3]
 
-  # shift row 2 two over
-  state[2][0] = stateTemp[2][2]
-  state[2][1] = stateTemp[2][3]
-  state[2][2] = stateTemp[2][0]
-  state[2][3] = stateTemp[2][1]  
+  state[1][0] = stateTemp[1][0]
+  state[2][1] = stateTemp[1][1]
+  state[3][2] = stateTemp[1][2]
+  state[0][3] = stateTemp[1][3]
 
-  # shift row 3 three over
-  state[3][0] = stateTemp[3][1]
-  state[3][1] = stateTemp[3][2]
-  state[3][2] = stateTemp[3][3]
-  state[3][3] = stateTemp[3][0]  
+  state[2][0] = stateTemp[2][0]
+  state[3][1] = stateTemp[2][1]
+  state[0][2] = stateTemp[2][2]
+  state[1][3] = stateTemp[2][3]
+
+  state[3][0] = stateTemp[3][0]
+  state[0][1] = stateTemp[3][1]
+  state[1][2] = stateTemp[3][2]
+  state[2][3] = stateTemp[3][3]
+
   return state
 
-def helperMultiply(a, b):
+def multiply(a, b):
   p = 0
   iterations = 8
   currIter = 0
-  while ( a < iterations and b < iterations and currIter < iterations):
+  while a != 0 and b != 0 and currIter < iterations:
     if (b & 0x01):
       p ^= a
     b = (b >> 1) & 0x7f
@@ -60,36 +69,37 @@ def helperMultiply(a, b):
     a = (a << 1)
     if carry:
       a ^= 0x011b
-    ++currIter
+    currIter += 1
   return p
 
 # each column of the state is multiplied 
 # with a fixed polynomial
-def invmixColumns(state):
+def inv_mix_columns(state):
 
   for column in range(4):
     copy = []
     for row in range(4):
-      copy.append(state[row][column])
+      copy.append(state[column][row])
 
-    state[0][column] = multiply(0x0e, copy[0]) ^ multiply(0x0b, copy[1]) ^ multiply(0x0d, copy[2]) ^ multiply(0x09, copy[3]);
-    state[1][column] = multiply(0x09, copy[0]) ^ multiply(0x0e, copy[1]) ^ multiply(0x0b, copy[2]) ^ multiply(0x0d, copy[3]);
-    state[2][column] = multiply(0x0d, copy[0]) ^ multiply(0x09, copy[1]) ^ multiply(0x0e, copy[2]) ^ multiply(0x0b, copy[3]);
-    state[3][column] = multiply(0x0b, copy[0]) ^ multiply(0x0d, copy[1]) ^ multiply(0x09, copy[2]) ^ multiply(0x0e, copy[3]);
+    state[column][0] = multiply(0x0e, copy[0]) ^ multiply(0x0b, copy[1]) ^ multiply(0x0d, copy[2]) ^ multiply(0x09, copy[3]);
+    state[column][1] = multiply(0x09, copy[0]) ^ multiply(0x0e, copy[1]) ^ multiply(0x0b, copy[2]) ^ multiply(0x0d, copy[3]);
+    state[column][2] = multiply(0x0d, copy[0]) ^ multiply(0x09, copy[1]) ^ multiply(0x0e, copy[2]) ^ multiply(0x0b, copy[3]);
+    state[column][3] = multiply(0x0b, copy[0]) ^ multiply(0x0d, copy[1]) ^ multiply(0x09, copy[2]) ^ multiply(0x0e, copy[3]);
 
-    return state
+  return state
 
 def decipher(state, keySchedule, numRounds):
   addRoundKey(state, keySchedule, numRounds);
 
-  for _round in range(numRounds, 0, -1):
-    state = invshiftRows(state)
-    state = invsubBytes(state)
+  for _round in range(numRounds - 1, 0, -1):
+    print("_roudn: " + str(_round))
+    state = inv_shift_rows(state)
+    state = inv_sub_bytes(state)
     state = addRoundKey(state, keySchedule, _round)
-    state = invmixColumns(state)
+    state = inv_mix_columns(state)
 
-  invShiftRows(state);
-  invSubBytes(state);
+  inv_shift_rows(state);
+  inv_sub_bytes(state);
   addRoundKey(state, keySchedule, 0);
 
   return state

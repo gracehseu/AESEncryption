@@ -2,8 +2,8 @@
 from cipher import cipher
 from keyschedule import keyExpansion
 
-def encrypt(inputFile, outputFile, keySize, keyFile, keyLength, numRounds):
-  keySchedule = keyExpansion(keyFile, keyLength)
+def encrypt(inputFile, outputFile, keySize, keyFile, keyLength, num_rounds):
+  keySchedule = keyExpansion(keyFile, keyLength, num_rounds)
 
   # numBytes = numBits // 8
   # read file as binary
@@ -25,13 +25,14 @@ def encrypt(inputFile, outputFile, keySize, keyFile, keyLength, numRounds):
     for row in range(4):
       state.append([])
       for column in range(4):
-        if len(state[row]) <= 0:
-          state[row].append([])
         state[row].append(chunk[row * 4 + column])
 
+    output = cipher(state, keySchedule, num_rounds)
+    output_bytes = bytearray()
+    for t in range(4):
+      output_bytes.extend(bytes(output[t]))
 
-
-    output = cipher(state, keySchedule, numRounds)
-    bytes_written = out_file.write(output)
+    bytes_written = out_file.write(output_bytes)
     # sanity check
     assert(bytes_written == 16)
+  out_file.close()
